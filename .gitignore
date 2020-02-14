@@ -1,4 +1,5 @@
 /.gradle
+/gradle
 /.idea
 /out
 /build
@@ -6,3 +7,5 @@
 *.ipr
 *.iws
 /classes/
+gradlew
+gradlew.bat
