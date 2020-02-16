@@ -30,5 +30,6 @@ dependencies {
     compile "org.postgresql:postgresql:$postgresql_version"
     compile "com.google.cloud.sql:postgres-socket-factory:$postgres_socket_version"
 
-    compile "org.jsoup:jsoup:$jsoup"
+    compile "org.jsoup:jsoup:$jsoup_version"
+    compile "org.json:json:$json_version"
 }
