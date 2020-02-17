@@ -6,6 +6,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
+import javax.management.monitor.StringMonitor
 
 private const val CITY_NAME_LENGTH = 30
 private const val DISTRICT_NAME_LENGTH = 30
@@ -38,3 +39,9 @@ class District(id: EntityID<Int>) : IntEntity(id) {
     var idCian by DistrictTable.idCian
     var cityName by DistrictTable.cityName
 }
+
+data class DistrictDto(
+    val name: String,
+    val idAvito: Int,
+    val idCian: Int = 0
+)
