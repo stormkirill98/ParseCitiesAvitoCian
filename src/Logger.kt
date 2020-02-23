@@ -38,4 +38,12 @@ object Logger {
     fun logWrongName(cityName: String, nameInJson: String, cite: String) {
         file.appendText("$currentCity: $cite. City name: $cityName. Name in json: $nameInJson\n")
     }
+
+    fun logNotDefineMetroId(metroName: String) {
+        file.appendText("$currentCity: cian. Not define id for $metroName\n")
+    }
+
+    fun logNotFoundLogs(metroName: String) {
+        file.appendText("$currentCity: cian. Not found logs with request for $metroName\n")
+    }
 }

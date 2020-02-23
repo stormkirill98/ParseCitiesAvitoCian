@@ -44,7 +44,8 @@ class District(id: EntityID<Int>) : IntEntity(id) {
 data class DistrictDto(
     val name: String,
     var idAvito: Int = 0,
-    var idCian: Int = 0
+    var idCian: Int = 0,
+    val isMetro: Boolean = false
 ) {
     fun toJSON(): JSONObject? {
         return JSONObject()

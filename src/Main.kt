@@ -1,7 +1,6 @@
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.File
 import java.io.FileNotFoundException
 import java.net.URLEncoder
 import java.nio.charset.Charset
@@ -84,20 +83,19 @@ fun getDistricts(avitoCityId: Int, cianCityId: Int): List<DistrictDto> {
         fetchData("https://www.avito.ru/web/1/locations/metro?locationId=$avitoCityId")
         isMetro = true
     }
-    val avitoDistricts = parseDistrictsJson(JSONArray(resAvito), "avito")
+    val avitoDistricts = parseDistrictsJson(JSONArray(resAvito), "avito", isMetro)
 
     val cianDistricts = if (isMetro) {
-        // TODO
-        emptyList<DistrictDto>()
+        HeadlessBrowser.getMetroCian("asd")
     } else {
         val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
-        parseDistrictsJson(JSONArray(resCian), "cian")
+        parseDistrictsJson(JSONArray(resCian), "cian", isMetro)
     }
 
     return combineDistricts(avitoDistricts, cianDistricts)
 }
 
-fun parseDistrictsJson(array: JSONArray, cite: String): ArrayList<DistrictDto> {
+fun parseDistrictsJson(array: JSONArray, cite: String, isMetro: Boolean): ArrayList<DistrictDto> {
     val districts = arrayListOf<DistrictDto>()
 
     for (obj in array) {
@@ -107,8 +105,8 @@ fun parseDistrictsJson(array: JSONArray, cite: String): ArrayList<DistrictDto> {
         val name = obj.getString("name")
 
         val district = if (cite == "cian")
-            DistrictDto(name, idCian = id)
-        else DistrictDto(name, idAvito = id)
+            DistrictDto(name, idCian = id, isMetro = isMetro)
+        else DistrictDto(name, idAvito = id, isMetro = isMetro)
 
         districts.add(district)
     }
@@ -178,19 +176,4 @@ fun getDistrictByName(list: List<DistrictDto>, name: String): DistrictDto? {
     }
 
     return null
-}
-
-fun writeCityWithDistricts(
-    cityName: String,
-    districts: List<DistrictDto>
-) {
-    val listDistrictJson = districts.map { it.toJSON() }
-    val id = transliterateCyrillicToLatin(cityName)
-
-    val json = JSONObject()
-        .put("id", id)
-        .put("name", cityName)
-        .put("districts", JSONArray(listDistrictJson))
-
-    File("test.json").appendText("$json \n\n")
 }

@@ -1,5 +1,8 @@
 import com.ibm.icu.text.Transliterator
 import org.jetbrains.exposed.sql.Database
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.File
 import java.net.URL
 
 fun checkUrl(url: String) =
@@ -37,4 +40,19 @@ fun connectDB() {
         user = "postgres",
         password = "admin"
     )
+}
+
+fun writeCityWithDistricts(
+    cityName: String,
+    districts: List<DistrictDto>
+) {
+    val listDistrictJson = districts.map { it.toJSON() }
+    val id = transliterateCyrillicToLatin(cityName)
+
+    val json = JSONObject()
+        .put("id", id)
+        .put("name", cityName)
+        .put("districts", JSONArray(listDistrictJson))
+
+    File("test.json").appendText("$json \n\n")
 }
