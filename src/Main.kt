@@ -1,49 +1,45 @@
-import com.ibm.icu.text.Transliterator
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
 import java.io.FileNotFoundException
-import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
 fun main() {
+    Logger.logNewRunning()
 //    connectDB()
     val cities = readCities()
 
-    val city = "Ярославль"
-    checkCityName(city)
-    try {
-        val avitoCityId = getAvitoCityId(city)
-        if (avitoCityId < 0) Logger.logWrongCityId(city, avitoCityId, "avito")
+    for (city in cities) {
+        println("Parse $city")
+        Logger.currentCity = city
+        checkCityName(city)
+        try {
+            val avitoCityId = getAvitoCityId(city)
+            if (avitoCityId < 0) Logger.logWrongCityId(avitoCityId, "avito")
 
-        val cianCityId = getCianCityId(city)
-        if (cianCityId < 0) Logger.logWrongCityId(city, cianCityId, "cian")
+            val cianCityId = getCianCityId(city)
+            if (cianCityId < 0) Logger.logWrongCityId(cianCityId, "cian")
 
-        saveDistricts(avitoCityId, cianCityId)
-    } catch (e: JSONException) {
-        Logger.logException(city, e)
+            if (avitoCityId < 0 || cianCityId < 0) continue;
+
+            val districts = getDistricts(avitoCityId, cianCityId)
+            writeCityWithDistricts(city, districts)
+            Thread.sleep(1000)
+        } catch (e: JSONException) {
+            Logger.logException(e)
+        }
+
+        Thread.sleep(1000)
     }
-
-    Thread.sleep(1000)
-}
-
-fun connectDB() {
-    Database.connect(
-        "jdbc:postgresql://35.242.227.75:5432/postgres",
-        driver = "org.postgresql.Driver",
-        user = "postgres",
-        password = "admin"
-    )
 }
 
 fun readCities(): List<String> {
     val file = {}.javaClass.getResource("cities.csv")
     val fileText = file.readText(Charset.forName("windows-1251"))
 
-    return fileText.lines().map { it.substringAfter(",") }
+    return fileText.lines().map { it.substringAfter(",") }.subList(0, 10)
 }
 
 fun getAvitoCityId(cityName: String): Int {
@@ -54,7 +50,10 @@ fun getAvitoCityId(cityName: String): Int {
 
     val firstLocation = locations?.first() as JSONObject? ?: return -1
     val nameInJson = firstLocation.getJSONObject("names")?.getString("1") ?: return -2
-    if (nameInJson != cityName) return -3
+    if (nameInJson != cityName) {
+        Logger.logWrongName(cityName, nameInJson, "avito")
+        return -3
+    }
 
     return firstLocation.getInt("id")
 }
@@ -67,28 +66,38 @@ fun getCianCityId(cityName: String): Int {
 
     val firstLocation = locations?.first() as JSONObject? ?: return -1
     val nameInJson = firstLocation.getString("displayName") ?: return -2
-    if (nameInJson != cityName) return -3
+    if (nameInJson != cityName) {
+        Logger.logWrongName(cityName, nameInJson, "cian")
+        return -3
+    }
 
     return firstLocation.getInt("id")
 }
 
-fun saveDistricts(avitoCityId: Int, cianCityId: Int) {
-    // TODO: check ids that are positive
+fun getDistricts(avitoCityId: Int, cianCityId: Int): List<DistrictDto> {
+    var isMetro = false
 
+    Thread.sleep(500)
     val resAvito = try {
         fetchData("https://www.avito.ru/web/1/locations/districts?locationId=$avitoCityId")
     } catch (e: FileNotFoundException) {
         fetchData("https://www.avito.ru/web/1/locations/metro?locationId=$avitoCityId")
+        isMetro = true
+    }
+    val avitoDistricts = parseDistrictsJson(JSONArray(resAvito), "avito")
+
+    val cianDistricts = if (isMetro) {
+        // TODO
+        emptyList<DistrictDto>()
+    } else {
+        val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
+        parseDistrictsJson(JSONArray(resCian), "cian")
     }
 
-    val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
-
-    // TODO: combine arrays
-    println(parseDistrictsArray(JSONArray(resAvito)))
-    println(parseDistrictsArray(JSONArray(resCian)))
+    return combineDistricts(avitoDistricts, cianDistricts)
 }
 
-fun parseDistrictsArray(array: JSONArray): ArrayList<DistrictDto> {
+fun parseDistrictsJson(array: JSONArray, cite: String): ArrayList<DistrictDto> {
     val districts = arrayListOf<DistrictDto>()
 
     for (obj in array) {
@@ -97,75 +106,91 @@ fun parseDistrictsArray(array: JSONArray): ArrayList<DistrictDto> {
         val id = obj.getInt("id")
         val name = obj.getString("name")
 
-        districts.add(DistrictDto(name, id))
+        val district = if (cite == "cian")
+            DistrictDto(name, idCian = id)
+        else DistrictDto(name, idAvito = id)
+
+        districts.add(district)
     }
 
     return districts
 }
 
-fun fetchData(url: String): String {
-    val connection = URL(url).openConnection()
+fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<DistrictDto>): List<DistrictDto> {
+    if (avitoDistricts.size != cianDistricts.size) {
+        Logger.logNotEqualsDistrictsSize(avitoDistricts.size, cianDistricts.size)
+    }
 
-    connection.addRequestProperty(
-        "User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-    )
-    connection.addRequestProperty("Cookie", "foo=bar")
-    connection.addRequestProperty("x-requested-with", "XMLHttpRequest")
-    connection.addRequestProperty("x-source", "client-browser")
-    connection.addRequestProperty("accept-language", "en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7")
+    val size = if (avitoDistricts.size > cianDistricts.size)
+        avitoDistricts.size
+    else cianDistricts.size
 
-    return connection.getInputStream().readBytes().toString(Charsets.UTF_8)
-}
+    val newList = ArrayList<DistrictDto>(size)
 
-fun saveDistrict(name: String, cityId: String, avitoId: Int = 0, cianId: Int = 0): District {
-    return transaction {
-        District.new {
-            this.name = name
-            this.cityName = cityId
-            this.idAvito = avitoId
-            this.idCian = cianId
+    for (i in 0 until size) {
+        if (i < cianDistricts.size) {
+            val districtFromCian = cianDistricts[i]
+            val districtFromAvito = getDistrictByName(avitoDistricts, districtFromCian.name)
+
+            if (districtFromAvito == null) Logger.logNotFoundDistrict(districtFromCian.name, "avito")
+
+            districtFromAvito?.let { districtFromCian.idAvito = districtFromAvito.idAvito }
+            newList.add(districtFromCian)
+            continue
+        }
+
+        if (i < avitoDistricts.size) {
+            val districtFromAvito = avitoDistricts[i]
+            val districtFromCian = getDistrictByName(cianDistricts, districtFromAvito.name)
+
+            if (districtFromCian == null) Logger.logNotFoundDistrict(districtFromAvito.name, "cian")
+
+            districtFromCian?.let { districtFromAvito.idCian = districtFromCian.idCian }
+            newList.add(districtFromAvito)
+            continue
         }
     }
-}
 
-fun saveCity(name: String): City {
-    val id = transliterateCyrillicToLatin(name)
-    return transaction {
-        City.new(id) {
-            this.name = name
-        }
-    }
+    return newList
 }
 
 fun checkCityName(name: String): Boolean {
     var result = true
-    val transliterateName = transliterateCyrillicToLatin(name.toLowerCase())
+    val transliterateName = transliterateCyrillicToLatin(name)
 
+    Thread.sleep(500)
     if (!checkUrl("https://www.avito.ru/$transliterateName")) {
-        Logger.logWrongTransliterateCityName(name, transliterateName, "avito")
+        Logger.logWrongTransliterateCityName(transliterateName, "avito")
         result = false
     }
-    Thread.sleep(500)
 
     if (!checkUrl("https://$transliterateName.cian.ru/")) {
-        Logger.logWrongTransliterateCityName(name, transliterateName, "cian")
+        Logger.logWrongTransliterateCityName(transliterateName, "cian")
         result = false
     }
-    Thread.sleep(500)
 
     return result
 }
 
-fun checkUrl(url: String) =
-    try {
-        URL(url).readText()
-        true
-    } catch (e: FileNotFoundException) {
-        false
+fun getDistrictByName(list: List<DistrictDto>, name: String): DistrictDto? {
+    for (district in list) {
+        if (district.name == name) return district
     }
 
-fun transliterateCyrillicToLatin(str: String): String {
-    val toLatinTrans = Transliterator.getInstance("Russian-Latin/BGN")
-    return toLatinTrans.transliterate(str).replace("ʹ", "")
+    return null
+}
+
+fun writeCityWithDistricts(
+    cityName: String,
+    districts: List<DistrictDto>
+) {
+    val listDistrictJson = districts.map { it.toJSON() }
+    val id = transliterateCyrillicToLatin(cityName)
+
+    val json = JSONObject()
+        .put("id", id)
+        .put("name", cityName)
+        .put("districts", JSONArray(listDistrictJson))
+
+    File("test.json").appendText("$json \n\n")
 }
