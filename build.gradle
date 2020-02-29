@@ -35,4 +35,5 @@ dependencies {
     compile "org.json:json:$json_version"
     compile "org.seleniumhq.selenium:selenium-java:$selenium_version"
     compile "com.google.guava:guava:$guava_version"
+    compile "com.moxproxy:moxproxy.core:$moxproxy_version"
 }

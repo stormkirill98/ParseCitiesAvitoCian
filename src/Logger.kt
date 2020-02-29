@@ -46,4 +46,12 @@ object Logger {
     fun logNotFoundLogs(metroName: String) {
         file.appendText("$currentCity: cian. Not found logs with request for $metroName\n")
     }
+
+    fun logNotClick(metroName: String) {
+        file.appendText("$currentCity: cian. not click on $metroName\n")
+    }
+
+    fun logNotLoadPage() {
+        file.appendText("$currentCity: not load page\n")
+    }
 }

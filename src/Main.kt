@@ -14,7 +14,7 @@ fun main() {
         println("Parse $city")
         Logger.currentCity = city
         checkCityName(city)
-        try {
+        /*try {
             val avitoCityId = getAvitoCityId(city)
             if (avitoCityId < 0) Logger.logWrongCityId(avitoCityId, "avito")
 
@@ -28,7 +28,7 @@ fun main() {
             Thread.sleep(1000)
         } catch (e: JSONException) {
             Logger.logException(e)
-        }
+        }*/
 
         Thread.sleep(1000)
     }
@@ -51,7 +51,6 @@ fun getAvitoCityId(cityName: String): Int {
     val nameInJson = firstLocation.getJSONObject("names")?.getString("1") ?: return -2
     if (nameInJson != cityName) {
         Logger.logWrongName(cityName, nameInJson, "avito")
-        return -3
     }
 
     return firstLocation.getInt("id")
@@ -67,7 +66,6 @@ fun getCianCityId(cityName: String): Int {
     val nameInJson = firstLocation.getString("displayName") ?: return -2
     if (nameInJson != cityName) {
         Logger.logWrongName(cityName, nameInJson, "cian")
-        return -3
     }
 
     return firstLocation.getInt("id")
@@ -80,17 +78,16 @@ fun getDistricts(avitoCityId: Int, cianCityId: Int): List<DistrictDto> {
     val resAvito = try {
         fetchData("https://www.avito.ru/web/1/locations/districts?locationId=$avitoCityId")
     } catch (e: FileNotFoundException) {
-        fetchData("https://www.avito.ru/web/1/locations/metro?locationId=$avitoCityId")
         isMetro = true
+        fetchData("https://www.avito.ru/web/1/locations/metro?locationId=$avitoCityId")
     }
     val avitoDistricts = parseDistrictsJson(JSONArray(resAvito), "avito", isMetro)
 
-    val cianDistricts = if (isMetro) {
-        HeadlessBrowser.getMetroCian("asd")
-    } else {
-        val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
-        parseDistrictsJson(JSONArray(resCian), "cian", isMetro)
-    }
+    /*if (isMetro) {
+       HeadlessBrowser.getMetroCian("asd")
+   } else {*/
+    val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
+    val cianDistricts = parseDistrictsJson(JSONArray(resCian), "cian", isMetro)
 
     return combineDistricts(avitoDistricts, cianDistricts)
 }
