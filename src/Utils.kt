@@ -3,12 +3,22 @@ import org.jetbrains.exposed.sql.Database
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.net.HttpURLConnection
 import java.net.URL
+
 
 fun checkUrl(url: String) =
     try {
-        URL(url).readText()
-        true
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.connect()
+        val code = connection.responseCode
+
+        if (connection.url.toString() != url) {
+            false
+        } else {
+            code == 200
+        }
     } catch (e: Exception) {
         false
     }

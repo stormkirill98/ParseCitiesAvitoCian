@@ -1,3 +1,134 @@
-*** 29-02 13:34 ***
+
+
+*** 29-02 13:52 ***
+Москва: not fetch moskva on cian
+Санкт-Петербург: not fetch sankt-peterburg on cian
 Екатеринбург: not fetch yekaterinburg on avito
+Екатеринбург: not fetch yekaterinburg on cian
 Нижний Новгород: not fetch nizhniy_novgorod on cian
+Ростов-на-Дону: not fetch rostov-na-donu on cian
+Иркутск: not fetch irkut·sk on avito
+Иркутск: not fetch irkut·sk on cian
+Хабаровск: not fetch khabarovsk on avito
+Хабаровск: not fetch khabarovsk on cian
+Махачкала: not fetch makhachkala on avito
+Махачкала: not fetch makhachkala on cian
+Новокузнецк: not fetch novokuznetsk on cian
+Астрахань: not fetch astrakhan on avito
+Астрахань: not fetch astrakhan on cian
+Набережные Челны: not fetch naberezhnyye_chelny on avito
+Набережные Челны: not fetch naberezhnyye_chelny on cian
+Киров: not fetch kirov on avito
+Балашиха: not fetch balashikha on avito
+Улан-Удэ: not fetch ulan-ud·e on avito
+Улан-Удэ: not fetch ulan-ud·e on cian
+Магнитогорск: not fetch magnitogorsk on cian
+Нижний Тагил: not fetch nizhniy_tagil on cian
+Архангельск: not fetch arkhangelsk on avito
+Архангельск: not fetch arkhangelsk on cian
+Симферополь: not fetch simferopol on cian
+Волжский: not fetch volzhskiy on avito
+Волжский: not fetch volzhskiy on cian
+Якутск: not fetch yakut·sk on avito
+Якутск: not fetch yakut·sk on cian
+Череповец: not fetch cherepovets on cian
+Орёл: not fetch orël on avito
+Орёл: not fetch orël on cian
+Нижневартовск: not fetch nizhnevartovsk on cian
+Стерлитамак: not fetch sterlitamak on cian
+Химки: not fetch khimki on avito
+Таганрог: not fetch taganrog on cian
+Комсомольск-на-Амуре: not fetch komsomolsk-na-amure on cian
+Нижнекамск: not fetch nizhnekamsk on cian
+Шахты: not fetch shakhty on avito
+Шахты: not fetch shakhty on cian
+Дзержинск: not fetch dzerzhinsk on cian
+Братск: not fetch brat·sk on avito
+Братск: not fetch brat·sk on cian
+Орск: not fetch orsk on cian
+Благовещенск: not fetch blagoveshchensk on avito
+Благовещенск: not fetch blagoveshchensk on cian
+Энгельс: not fetch engels on cian
+Ангарск: not fetch angarsk on cian
+Великий Новгород: not fetch velikiy_novgorod on cian
+Королёв: not fetch korolëv on avito
+Королёв: not fetch korolëv on cian
+Старый Оскол: not fetch staryy_oskol on cian
+Мытищи: not fetch mytishchi on avito
+Южно-Сахалинск: not fetch yuzhno-sakhalinsk on avito
+Южно-Сахалинск: not fetch yuzhno-sakhalinsk on cian
+Бийск: not fetch biysk on cian
+Прокопьевск: not fetch prokopyevsk on avito
+Прокопьевск: not fetch prokopyevsk on cian
+Армавир: not fetch armavir on cian
+Балаково: not fetch balakovo on cian
+Рыбинск: not fetch rybinsk on cian
+Северодвинск: not fetch severodvinsk on cian
+Петропавловск-Камчатский: not fetch petropavlovsk-kamchat·skiy on avito
+Петропавловск-Камчатский: not fetch petropavlovsk-kamchat·skiy on cian
+Норильск: not fetch norilsk on cian
+Уссурийск: not fetch ussuriysk on cian
+Волгодонск: not fetch volgodonsk on cian
+Красногорск: not fetch krasnogorsk on avito
+Сызрань: not fetch syzran on cian
+Новочеркасск: not fetch novocherkassk on cian
+Каменск-Уральский: not fetch kamensk-uralskiy on cian
+Златоуст: not fetch zlatoust on cian
+Альметьевск: not fetch almetyevsk on avito
+Альметьевск: not fetch almetyevsk on cian
+Миасс: not fetch miass on cian
+Керчь: not fetch kerch on cian
+Салават: not fetch salavat on cian
+Копейск: not fetch kopeysk on cian
+Находка: not fetch nakhodka on avito
+Находка: not fetch nakhodka on cian
+Пятигорск: not fetch pyatigorsk on cian
+Хасавюрт: not fetch khasavyurt on avito
+Хасавюрт: not fetch khasavyurt on cian
+Рубцовск: not fetch rubtsovsk on cian
+Березники: not fetch berezniki on cian
+Ковров: not fetch kovrov on cian
+Кисловодск: not fetch kislovodsk on cian
+Нефтекамск: not fetch neftekamsk on cian
+Нефтеюганск: not fetch nefteyugansk on cian
+Батайск: not fetch bataysk on cian
+Новочебоксарск: not fetch novocheboksarsk on cian
+Дербент: not fetch derbent on cian
+Серпухов: not fetch serpukhov on avito
+Щёлково: not fetch shchëlkovo on avito
+Щёлково: not fetch shchëlkovo on cian
+Каспийск: not fetch kaspiysk on cian
+Новомосковск: not fetch novomoskovsk on cian
+Первоуральск: not fetch pervouralsk on cian
+Раменское: not fetch ramenskoye on avito
+Обнинск: not fetch obninsk on cian
+Орехово-Зуево: not fetch orekhovo-zuyevo on avito
+Новый Уренгой: not fetch novyy_urengoy on cian
+Невинномысск: not fetch nevinnomyssk on cian
+Димитровград: not fetch dimitrovgrad on cian
+Октябрьский: not fetch oktyabrskiy on avito
+Октябрьский: not fetch oktyabrskiy on cian
+Долгопрудный: not fetch dolgoprudnyy on cian
+Камышин: not fetch kamyshin on cian
+Ессентуки: not fetch yessentuki on avito
+Ессентуки: not fetch yessentuki on cian
+Муром: not fetch murom on cian
+Жуковский: not fetch zhukovskiy on cian
+Евпатория: not fetch yevpatoriya on avito
+Евпатория: not fetch yevpatoriya on cian
+Новошахтинск: not fetch novoshakhtinsk on avito
+Новошахтинск: not fetch novoshakhtinsk on cian
+Артём: not fetch artëm on avito
+Артём: not fetch artëm on cian
+Северск: not fetch seversk on cian
+Ноябрьск: not fetch noyabrsk on cian
+Ачинск: not fetch achinsk on cian
+Арзамас: not fetch arzamas on cian
+Бердск: not fetch berdsk on cian
+Елец: not fetch yelets on avito
+Елец: not fetch yelets on cian
+Сергиев Посад: not fetch sergiyev_posad on avito
+Сергиев Посад: not fetch sergiyev_posad on cian
+Новокуйбышевск: not fetch novokuybyshevsk on cian
+Железногорск: not fetch zheleznogorsk on avito
+Железногорск: not fetch zheleznogorsk on cian

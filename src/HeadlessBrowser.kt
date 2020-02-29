@@ -14,7 +14,6 @@ fun main() {
     HeadlessBrowser().use { it.getMetroCian("Казань") }
 }
 
-
 const val PROXY_PORT = 8089
 
 class HeadlessBrowser : Closeable {
