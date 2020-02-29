@@ -54,4 +54,8 @@ object Logger {
     fun logNotLoadPage() {
         file.appendText("$currentCity: not load page\n")
     }
+
+    fun logNotDefineUrl(name: String, cite: String) {
+        file.appendText("$name: not define url for $cite\n")
+    }
 }
