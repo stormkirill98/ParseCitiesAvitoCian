@@ -6,32 +6,37 @@ import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions
 import java.io.Closeable
 import java.io.File
-import java.lang.Exception
+import java.util.concurrent.TimeUnit
 
 const val FILE_NAME = "more_cities"
 const val CIAN_URL = "https://yaroslavl.cian.ru/"
 const val AVITO_URL = "https://www.avito.ru/yaroslavl"
 
-const val CIAN_BUTTON_SHOW_SEARCH_CLASS = "geo-link--9bfd399c7a2845c23cfa3b226716fd27"
-const val CIAN_SEARCH_INPUT_CLASS = "text_field_component-input-r5g2rpzU text_field_component-small-8egraV0q input--9c1e16c1ec4b69df81049cd40d4c9ed4"
+const val CIAN_BUTTON_SHOW_SEARCH_CLASS = "c-header-top-link c-header-top-menu-item"
+const val CIAN_SEARCH_INPUT_CLASS =
+    "text_field_component-input-r5g2rpzU text_field_component-small-8egraV0q input--9c1e16c1ec4b69df81049cd40d4c9ed4"
 const val CIAN_SUGGESTIONS_LIST_CLASS = "list--79e175a2c2de90a657da1f79e3a62c08"
-const val CIAN_ENTER_BUTTON = "button_component-button-3KmZZLvJ button_component-S-th694M5g button_component-default-LU0A0kvh button_component-primary-2nYBoa2Y button--8da9b20b88751e792a7fc2fcb7bd90ee"
+const val CIAN_ENTER_BUTTON =
+    "button_component-button-3KmZZLvJ button_component-S-th694M5g button_component-default-LU0A0kvh button_component-primary-2nYBoa2Y button--8da9b20b88751e792a7fc2fcb7bd90ee"
 
 const val AVITO_BUTTON_SHOW_SEARCH_CLASS = "main-locationWrapper-3C0pT"
 const val AVITO_SEARCH_INPUT_CLASS = "suggest-input-3p8yi"
 const val AVITO_SUGGESTIONS_LIST_CLASS = "suggest-suggests-bMAdj"
 const val AVITO_ENTER_BUTTON = "button-button-2Fo5k button-size-m-7jtw4 button-primary-1RhOG"
 
+enum class Cite { AVITO, CIAN }
+
 fun main() {
-    val cities = readCities().subList(0, 10)
+    Logger.logNewRunning()
+
+    val cities = readCities().subList(0, 50)
     val jsonArray = JSONArray()
 
-    var index = 1
-    for (cityName in cities) {
-        println("Read $index. $cityName")
+    for ((i, cityName) in cities.withIndex()) {
+        println("Read ${i + 1}. $cityName")
 
         val jsonCity = JSONObject().apply {
-            put("id", index++)
+            put("id", i + 1)
             put("name", cityName)
         }
 
@@ -40,35 +45,34 @@ fun main() {
 
     Browser().use {
         it.openCianPage()
-        fillCities("cian_url", jsonArray, it)
+        fillCities(Cite.CIAN, jsonArray, it)
 
         it.openAvitoPage()
-        fillCities("avito_url", jsonArray, it)
+        fillCities(Cite.AVITO, jsonArray, it)
     }
 
     writeCities(jsonArray)
 }
 
-fun fillCities(key: String, jsonArray: JSONArray, browser: Browser) {
-    for (jsonObj in jsonArray) {
+fun fillCities(cite: Cite, jsonArray: JSONArray, browser: Browser) {
+    for ((i, jsonObj) in jsonArray.withIndex()) {
         if (jsonObj !is JSONObject) continue
 
-        if (jsonObj.getString(key).isEmpty()) {
-            val name = jsonObj.getString("name")
-            println("Fill $key. $name")
+        val name = jsonObj.getString("name")
+        val percent = ( i + 1) / jsonArray.length().toDouble()
+        println("$i Fill $cite. $name       ${percent.formatExt(2)}")
 
-            val url = if (key == "avito_url")
-                                browser.getAvitoUrl(name)
-                             else browser.getCianUrl(name)
+        val (url, id) = if (cite == Cite.AVITO)
+            browser.getAvitoInfo(name)
+        else browser.getCianInfo(name)
 
-            if (url.isEmpty()) {
-                Logger.logNotDefineUrl(name, key)
-                continue
-            }
-
-            jsonObj.put(key, url)
-            Thread.sleep(500)
+        if (url.isEmpty() || id == null) {
+            Logger.logNotDefineUrlOrId(name, cite.name)
         }
+
+        jsonObj.put(cite.name.toLowerCase() + "_url", url)
+        jsonObj.put(cite.name.toLowerCase() + "_id", id)
+        Thread.sleep(500)
     }
 }
 
@@ -100,11 +104,12 @@ class Browser : Closeable {
         )
 
         val options = ChromeOptions().apply {
-//            setHeadless(true)
+            setHeadless(true)
             setAcceptInsecureCerts(true)
         }
 
         driver = ChromeDriver(options)
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS)
     }
 
     override fun close() {
@@ -119,23 +124,27 @@ class Browser : Closeable {
         driver.get(AVITO_URL)
     }
 
-    fun getCianUrl(cityName: String): String {
+    fun getCianInfo(cityName: String): Pair<String, Int?> {
         return try {
             goToCityPage(
                 cityName,
-                "svg[class='$CIAN_BUTTON_SHOW_SEARCH_CLASS']",
+                "a[class='$CIAN_BUTTON_SHOW_SEARCH_CLASS']",
                 "input[class='$CIAN_SEARCH_INPUT_CLASS']",
                 "ul[class='$CIAN_SUGGESTIONS_LIST_CLASS']",
                 "button[class='$CIAN_ENTER_BUTTON']"
             )
 
-            driver.currentUrl
+            val sessionKey = driver.manage().getCookieNamed("session_region_id")
+            val id = sessionKey?.value?.toIntOrNull()
+
+            driver.currentUrl to id
         } catch (e: Exception) {
-            ""
+            e.printStackTrace()
+            "" to null
         }
     }
 
-    fun getAvitoUrl(cityName: String): String {
+    fun getAvitoInfo(cityName: String): Pair<String, Int?> {
         return try {
             goToCityPage(
                 cityName,
@@ -145,9 +154,12 @@ class Browser : Closeable {
                 "button[class='$AVITO_ENTER_BUTTON']"
             )
 
-            driver.currentUrl
+            val sessionKey = driver.manage().getCookieNamed("buyer_location_id")
+            val id = sessionKey?.value?.toIntOrNull()
+
+            driver.currentUrl to id
         } catch (e: Exception) {
-            ""
+            "" to null
         }
     }
 
@@ -158,19 +170,26 @@ class Browser : Closeable {
         suggestionListSelector: String,
         confirmButtonSelector: String
     ) {
-        val btnShowSearchCity =
-            driver.findElement(By.cssSelector(btnShowSearchCitySelector))
-        click(btnShowSearchCity, 200)
+        val btnShowSearchCity = driver.findElement(By.cssSelector(btnShowSearchCitySelector))
+        click(btnShowSearchCity, 0)
 
         val inputField = driver.findElement(By.cssSelector(inputFieldSelector))
         type(cityName, inputField)
 
         val suggestionsListEl = driver.findElement(By.cssSelector(suggestionListSelector))
         val suggestionElements = suggestionsListEl.findElements(By.tagName("li"))
-        click(suggestionElements.first())
+        val suggestionEl = suggestionElements.first { it.text.substringBefore(",") == cityName }
+        click(suggestionEl)
 
         val sendButton = driver.findElement(By.cssSelector(confirmButtonSelector))
         click(sendButton)
+
+        try {
+            val cityNameOnPage = driver.findElement(By.cssSelector(btnShowSearchCitySelector)).text
+            if (cityNameOnPage != cityName) {
+                Logger.logWrongNameOnPage(cityName, cityNameOnPage, driver.currentUrl)
+            }
+        } catch (e: Exception) { }
     }
 
     private fun click(el: WebElement, timeoutMs: Long = 1000): Boolean {
@@ -196,3 +215,5 @@ class Browser : Closeable {
         Thread.sleep(500)
     }
 }
+
+fun Double.formatExt(digits: Int) = "%.${digits}f".format(this)

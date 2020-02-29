@@ -55,7 +55,12 @@ object Logger {
         file.appendText("$currentCity: not load page\n")
     }
 
-    fun logNotDefineUrl(name: String, cite: String) {
-        file.appendText("$name: not define url for $cite\n")
+    fun logNotDefineUrlOrId(cityName: String, cite: String) {
+        file.appendText("$cityName: not define url or id on $cite\n")
+    }
+
+    fun logWrongNameOnPage(cityName: String, cityNameOnPage: String, currentUrl: String) {
+        file.appendText("$cityName: on page $currentUrl name is $cityNameOnPage\n")
+
     }
 }

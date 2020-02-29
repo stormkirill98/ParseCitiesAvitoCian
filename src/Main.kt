@@ -2,7 +2,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.FileNotFoundException
 import java.net.URLEncoder
-import java.nio.charset.Charset
 
 fun main() {
     Logger.logNewRunning()
