@@ -18,18 +18,20 @@ const val CIAN_SEARCH_INPUT_CLASS =
 const val CIAN_SUGGESTIONS_LIST_CLASS = "list--79e175a2c2de90a657da1f79e3a62c08"
 const val CIAN_ENTER_BUTTON =
     "button_component-button-3KmZZLvJ button_component-S-th694M5g button_component-default-LU0A0kvh button_component-primary-2nYBoa2Y button--8da9b20b88751e792a7fc2fcb7bd90ee"
+const val CIAN_CLOSE_SEARCH_CLASS = "close--b220039b0345a01d127bf4b34008b665"
 
 const val AVITO_BUTTON_SHOW_SEARCH_CLASS = "main-locationWrapper-3C0pT"
 const val AVITO_SEARCH_INPUT_CLASS = "suggest-input-3p8yi"
 const val AVITO_SUGGESTIONS_LIST_CLASS = "suggest-suggests-bMAdj"
 const val AVITO_ENTER_BUTTON = "button-button-2Fo5k button-size-m-7jtw4 button-primary-1RhOG"
+const val AVITO_CLOSE_SEARCH_CLASS = "popup-close-2W0cr"
 
 enum class Cite { AVITO, CIAN }
 
 fun main() {
     Logger.logNewRunning()
 
-    val cities = readCities().subList(0, 50)
+    val cities = readCities()
     val jsonArray = JSONArray()
 
     for ((i, cityName) in cities.withIndex()) {
@@ -51,7 +53,16 @@ fun main() {
         fillCities(Cite.AVITO, jsonArray, it)
     }
 
-    writeCities(jsonArray)
+
+    val filteredArray =
+        jsonArray.filter {
+            !((it as JSONObject).getString("cian_url").isEmpty()
+                    && it.getString("cian_url").isEmpty())
+        }
+
+    println("Save ${filteredArray.size}")
+
+    writeCities(JSONArray(filteredArray))
 }
 
 fun fillCities(cite: Cite, jsonArray: JSONArray, browser: Browser) {
@@ -59,7 +70,7 @@ fun fillCities(cite: Cite, jsonArray: JSONArray, browser: Browser) {
         if (jsonObj !is JSONObject) continue
 
         val name = jsonObj.getString("name")
-        val percent = ( i + 1) / jsonArray.length().toDouble()
+        val percent = (i + 1) / jsonArray.length().toDouble()
         println("$i Fill $cite. $name       ${percent.formatExt(2)}")
 
         val (url, id) = if (cite == Cite.AVITO)
@@ -104,7 +115,7 @@ class Browser : Closeable {
         )
 
         val options = ChromeOptions().apply {
-            setHeadless(true)
+            setHeadless(false)
             setAcceptInsecureCerts(true)
         }
 
@@ -138,6 +149,13 @@ class Browser : Closeable {
             val id = sessionKey?.value?.toIntOrNull()
 
             driver.currentUrl to id
+        } catch (e: NoSuchElementException) {
+            try {
+                val closeButton = driver.findElement(By.cssSelector("svg[class='$CIAN_CLOSE_SEARCH_CLASS']"))
+                click(closeButton, 0)
+            } catch (e: Exception) {
+            }
+            "" to null
         } catch (e: Exception) {
             e.printStackTrace()
             "" to null
@@ -158,6 +176,13 @@ class Browser : Closeable {
             val id = sessionKey?.value?.toIntOrNull()
 
             driver.currentUrl to id
+        } catch (e: NoSuchElementException) {
+            try {
+                val closeButton = driver.findElement(By.cssSelector("button[class='$AVITO_CLOSE_SEARCH_CLASS']"))
+                click(closeButton, 0)
+            } catch (e: Exception) {
+            }
+            "" to null
         } catch (e: Exception) {
             "" to null
         }
@@ -178,7 +203,9 @@ class Browser : Closeable {
 
         val suggestionsListEl = driver.findElement(By.cssSelector(suggestionListSelector))
         val suggestionElements = suggestionsListEl.findElements(By.tagName("li"))
-        val suggestionEl = suggestionElements.first { it.text.substringBefore(",") == cityName }
+        val suggestionEl = suggestionElements.first {
+            it.text.substringBefore(",") == cityName || it.text.substringBefore(" (") == cityName
+        }
         click(suggestionEl)
 
         val sendButton = driver.findElement(By.cssSelector(confirmButtonSelector))
@@ -189,7 +216,8 @@ class Browser : Closeable {
             if (cityNameOnPage != cityName) {
                 Logger.logWrongNameOnPage(cityName, cityNameOnPage, driver.currentUrl)
             }
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+        }
     }
 
     private fun click(el: WebElement, timeoutMs: Long = 1000): Boolean {
@@ -204,14 +232,23 @@ class Browser : Closeable {
     }
 
     private fun type(text: String, el: WebElement) {
-        Actions(driver)
+        val action = Actions(driver)
             .click(el)
             .keyDown(Keys.CONTROL)
             .sendKeys("a")
             .keyUp(Keys.CONTROL)
-            .sendKeys(text)
-            .build()
-            .perform()
+            .pause(10)
+        /*.sendKeys(text)
+        .build()
+        .perform()*/
+
+        for (c in text) {
+            action.sendKeys(c.toString())
+                .pause(100)
+        }
+
+        action.build().perform()
+
         Thread.sleep(500)
     }
 }
