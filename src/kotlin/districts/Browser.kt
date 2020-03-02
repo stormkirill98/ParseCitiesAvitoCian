@@ -1,6 +1,5 @@
 package districts
 
-import saving.DistrictDto
 import Logger
 import moxproxy.builders.LocalMoxProxy
 import moxproxy.interfaces.MoxProxy
@@ -11,7 +10,8 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.RemoteWebElement
-import writeCityWithDistricts
+import saving.DistrictDto
+import saving.writeCityWithDistricts
 import java.io.Closeable
 
 
@@ -43,7 +43,7 @@ class Browser : Closeable {
             .setAutodetect(false)
 
         val options = ChromeOptions().apply {
-//            setHeadless(true)
+            //setHeadless(true)
             setProxy(proxyOpt)
             setAcceptInsecureCerts(true)
         }
@@ -74,7 +74,7 @@ class Browser : Closeable {
                 // break by exception
                 while (++index < 20) {
                     val metroElement = allMetroContainer
-                            .findElement(By.xpath(".//*[$index]"))
+                        .findElement(By.xpath(".//*[$index]"))
 
                     try {
                         val name = metroElement.text
@@ -117,7 +117,8 @@ class Browser : Closeable {
             }
         }
 
-        writeCityWithDistricts("Казань", metroList)
+        // TODO: set fileName
+        writeCityWithDistricts("", "Казань", metroList)
 
         return metroList
     }

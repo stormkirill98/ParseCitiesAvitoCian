@@ -1,11 +1,11 @@
 package districts
 
-import saving.DistrictDto
 import Logger
 import checkUrl
 import fetchData
 import org.json.JSONArray
 import org.json.JSONObject
+import saving.DistrictDto
 import saving.readCities
 import transliterateCyrillicToLatin
 import java.io.FileNotFoundException

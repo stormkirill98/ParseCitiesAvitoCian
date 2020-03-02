@@ -8,8 +8,10 @@ fun main() {
 
     val jsonArray = JSONObject(fileText).getJSONArray("cities")
 
-    val filteredArray = jsonArray.filter { (it as JSONObject).getString("cian_url").isEmpty()
-            || it.getString("avito_url").isEmpty() }
+    val filteredArray = jsonArray.filter {
+        (it as JSONObject).getString("cian_url").isEmpty()
+                || it.getString("avito_url").isEmpty()
+    }
 
     val countCianEmpty = filteredArray.count { (it as JSONObject).getString("cian_url").isEmpty() }
     val countAvitoEmpty = filteredArray.count { (it as JSONObject).getString("avito_url").isEmpty() }

@@ -4,15 +4,8 @@ import Logger
 import formatExt
 import org.json.JSONArray
 import org.json.JSONObject
-import org.openqa.selenium.*
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.interactions.Actions
 import saving.readCities
 import saving.writeCities
-import java.io.Closeable
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 const val FILE_NAME = "more_cities"
 const val CIAN_URL = "https://yaroslavl.cian.ru/"

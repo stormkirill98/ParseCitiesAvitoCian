@@ -1,9 +1,4 @@
 import com.ibm.icu.text.Transliterator
-import org.jetbrains.exposed.sql.Database
-import org.json.JSONArray
-import org.json.JSONObject
-import saving.DistrictDto
-import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
