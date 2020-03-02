@@ -1,27 +1,36 @@
+package districts
+
+import saving.DistrictDto
+import Logger
+import checkUrl
+import fetchData
 import org.json.JSONArray
 import org.json.JSONObject
+import saving.readCities
+import transliterateCyrillicToLatin
 import java.io.FileNotFoundException
 import java.net.URLEncoder
 
+const val FILE_NAME = "cities"
+
 fun main() {
     Logger.logNewRunning()
-//    connectDB()
-    val cities = readCities()
+    val cities = readCities(FILE_NAME)
 
     for (city in cities) {
         println("Parse $city")
         Logger.currentCity = city
         checkCityName(city)
         /*try {
-            val avitoCityId = getAvitoCityId(city)
+            val avitoCityId = districts.getAvitoCityId(city)
             if (avitoCityId < 0) Logger.logWrongCityId(avitoCityId, "avito")
 
-            val cianCityId = getCianCityId(city)
+            val cianCityId = districts.getCianCityId(city)
             if (cianCityId < 0) Logger.logWrongCityId(cianCityId, "cian")
 
             if (avitoCityId < 0 || cianCityId < 0) continue;
 
-            val districts = getDistricts(avitoCityId, cianCityId)
+            val districts = districts.getDistricts(avitoCityId, cianCityId)
             writeCityWithDistricts(city, districts)
             Thread.sleep(1000)
         } catch (e: JSONException) {
@@ -76,7 +85,7 @@ fun getDistricts(avitoCityId: Int, cianCityId: Int): List<DistrictDto> {
     val avitoDistricts = parseDistrictsJson(JSONArray(resAvito), "avito", isMetro)
 
     /*if (isMetro) {
-       HeadlessBrowser.getMetroCian("asd")
+       districts.HeadlessBrowser.getMetroCian("asd")
    } else {*/
     val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
     val cianDistricts = parseDistrictsJson(JSONArray(resCian), "cian", isMetro)
@@ -117,7 +126,8 @@ fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<Dist
     for (i in 0 until size) {
         if (i < cianDistricts.size) {
             val districtFromCian = cianDistricts[i]
-            val districtFromAvito = getDistrictByName(avitoDistricts, districtFromCian.name)
+            val districtFromAvito =
+                getDistrictByName(avitoDistricts, districtFromCian.name)
 
             if (districtFromAvito == null) Logger.logNotFoundDistrict(districtFromCian.name, "avito")
 

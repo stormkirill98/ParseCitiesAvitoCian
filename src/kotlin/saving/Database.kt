@@ -1,3 +1,5 @@
+package saving
+
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.IntEntity
@@ -6,8 +8,10 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.json.JSONObject
+import transliterateCyrillicToLatin
 
 private const val CITY_NAME_LENGTH = 30
 private const val DISTRICT_NAME_LENGTH = 30
@@ -53,6 +57,15 @@ data class DistrictDto(
             .put("avito_id", idAvito)
             .put("cian_id", idCian)
     }
+}
+
+fun connectDB() {
+    Database.connect(
+        "jdbc:postgresql://35.242.227.75:5432/postgres",
+        driver = "org.postgresql.Driver",
+        user = "postgres",
+        password = "admin"
+    )
 }
 
 fun saveDistrict(name: String, cityId: String, avitoId: Int = 0, cianId: Int = 0): District {

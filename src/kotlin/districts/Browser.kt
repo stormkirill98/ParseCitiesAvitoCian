@@ -1,3 +1,7 @@
+package districts
+
+import saving.DistrictDto
+import Logger
 import moxproxy.builders.LocalMoxProxy
 import moxproxy.interfaces.MoxProxy
 import org.json.JSONException
@@ -7,16 +11,17 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.RemoteWebElement
+import writeCityWithDistricts
 import java.io.Closeable
 
 
 fun main() {
-    HeadlessBrowser().use { it.getMetroCian("Казань") }
+    Browser().use { it.getMetroCian("Казань") }
 }
 
 const val PROXY_PORT = 8089
 
-class HeadlessBrowser : Closeable {
+class Browser : Closeable {
     private val driver: WebDriver
     private val proxy: MoxProxy = LocalMoxProxy.builder()
         .withPort(PROXY_PORT)

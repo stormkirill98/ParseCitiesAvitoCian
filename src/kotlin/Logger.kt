@@ -36,7 +36,7 @@ object Logger {
     }
 
     fun logWrongName(cityName: String, nameInJson: String, cite: String) {
-        file.appendText("$currentCity: $cite. City name: $cityName. Name in json: $nameInJson\n")
+        file.appendText("$currentCity: $cite. saving.City name: $cityName. Name in json: $nameInJson\n")
     }
 
     fun logNotDefineMetroId(metroName: String) {
