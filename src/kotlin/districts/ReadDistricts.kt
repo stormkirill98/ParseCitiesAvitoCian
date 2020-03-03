@@ -1,75 +1,33 @@
 package districts
 
 import Logger
-import checkUrl
 import fetchData
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import saving.DistrictDto
-import saving.readCities
-import transliterateCyrillicToLatin
+import saving.readCitiesJson
+import saving.writeCitiesWithDistricts
 import java.io.FileNotFoundException
-import java.net.URLEncoder
 
 const val FILE_NAME = "cities"
 
 fun main() {
     Logger.logNewRunning()
-    val cities = readCities(FILE_NAME)
+    val cities = readCitiesJson(FILE_NAME)
 
     for (city in cities) {
-        println("Parse $city")
-        Logger.currentCity = city
-        checkCityName(city)
-        /*try {
-            val avitoCityId = districts.getAvitoCityId(city)
-            if (avitoCityId < 0) Logger.logWrongCityId(avitoCityId, "avito")
-
-            val cianCityId = districts.getCianCityId(city)
-            if (cianCityId < 0) Logger.logWrongCityId(cianCityId, "cian")
-
-            if (avitoCityId < 0 || cianCityId < 0) continue;
-
-            val districts = districts.getDistricts(avitoCityId, cianCityId)
-            writeCityWithDistricts(city, districts)
-            Thread.sleep(1000)
-        } catch (e: JSONException) {
-            Logger.logException(e)
-        }*/
+        println("Get districts for ${city.name}")
+        Logger.currentCity = city.name
+        try {
+            val districts = getDistricts(city.avitoId, city.cianId)
+            city.addDistricts(districts)
+        } catch (e: JSONException) { Logger.logException(e) }
 
         Thread.sleep(1000)
     }
-}
 
-
-fun getAvitoCityId(cityName: String): Int {
-    val encodeCityName = URLEncoder.encode(cityName, Charsets.UTF_8.toString())
-    val res = fetchData("https://www.avito.ru/web/1/slocations?limit=5&q=$encodeCityName")
-
-    val locations = JSONObject(res).getJSONObject("result")?.getJSONArray("locations")
-
-    val firstLocation = locations?.first() as JSONObject? ?: return -1
-    val nameInJson = firstLocation.getJSONObject("names")?.getString("1") ?: return -2
-    if (nameInJson != cityName) {
-        Logger.logWrongName(cityName, nameInJson, "avito")
-    }
-
-    return firstLocation.getInt("id")
-}
-
-fun getCianCityId(cityName: String): Int {
-    val encodeCityName = URLEncoder.encode(cityName, Charsets.UTF_8.toString())
-    val res = fetchData("https://yaroslavl.cian.ru/cian-api/site/v1/search-regions-cities/?text=$encodeCityName")
-
-    val locations = JSONObject(res).getJSONObject("data")?.getJSONArray("items")
-
-    val firstLocation = locations?.first() as JSONObject? ?: return -1
-    val nameInJson = firstLocation.getString("displayName") ?: return -2
-    if (nameInJson != cityName) {
-        Logger.logWrongName(cityName, nameInJson, "cian")
-    }
-
-    return firstLocation.getInt("id")
+    writeCitiesWithDistricts(FILE_NAME, cities)
 }
 
 fun getDistricts(avitoCityId: Int, cianCityId: Int): List<DistrictDto> {
@@ -149,24 +107,6 @@ fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<Dist
     }
 
     return newList
-}
-
-fun checkCityName(name: String): Boolean {
-    var result = true
-    val transliterateName = transliterateCyrillicToLatin(name)
-
-    Thread.sleep(500)
-    if (!checkUrl("https://www.avito.ru/$transliterateName")) {
-        Logger.logWrongTransliterateCityName(transliterateName, "avito")
-        result = false
-    }
-
-    if (!checkUrl("https://$transliterateName.cian.ru/")) {
-        Logger.logWrongTransliterateCityName(transliterateName, "cian")
-        result = false
-    }
-
-    return result
 }
 
 fun getDistrictByName(list: List<DistrictDto>, name: String): DistrictDto? {

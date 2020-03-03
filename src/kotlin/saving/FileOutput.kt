@@ -2,7 +2,6 @@ package saving
 
 import org.json.JSONArray
 import org.json.JSONObject
-import transliterateCyrillicToLatin
 import java.io.File
 
 /**
@@ -13,7 +12,7 @@ import java.io.File
  * @param fileName
  * @return list of city names
  */
-fun readCities(fileName: String): List<String> {
+fun readCitiesCsv(fileName: String): List<String> {
     val file = {}.javaClass.getResource("$fileName.csv")
     val fileText = file.readText()
 
@@ -21,41 +20,105 @@ fun readCities(fileName: String): List<String> {
 }
 
 /**
+ * Read city names from .json file
+ * File put into resources package
+ * File format:
+ * {
+ *   cities: [
+ *      {
+ *        id: 'int',
+ *        name: 'string' ,
+ *        cian_url: 'string',
+ *        cian_id: 'int',
+ *        avito_url: 'string',
+ *        avito_id: 'int'
+ *      },
+ *      ...
+ *   ]
+ *}
+ * @param fileName
+ * @return list of CityDto
+ */
+fun readCitiesJson(fileName: String): List<CityDto> {
+    val file = {}.javaClass.getResource("$fileName.json")
+    val fileText = file.readText()
+
+    try {
+        val jsonArray = JSONObject(fileText).getJSONArray("cities")
+
+        return jsonArray.map {
+            val json = it as JSONObject
+
+            val name = json.getString("name")
+            val cianUrl = try { json.getString("cian_url") } catch (e: Exception) { "" }
+            val cianId = try { json.getInt("cian_url") } catch (e: Exception) { 0 }
+            val avitoUrl = try { json.getString("avito_url") } catch (e: Exception) { "" }
+            val avitoId = try { json.getInt("cian_url") } catch (e: Exception) { 0 }
+
+            return@map CityDto(name, avitoUrl, avitoId, cianUrl, cianId)
+        }
+    } catch (e: Exception) { e.printStackTrace(); return emptyList() }
+}
+
+/**
  * Write cities to .json file
+ * File format:
+ * {
+ *   cities: [
+ *      {
+ *        name: 'string' ,
+ *        cian_url: 'string',
+ *        cian_id: 'int',
+ *        avito_url: 'string',
+ *        avito_id: 'int',
+ *        districts: [
+ *          {
+ *            name: 'string',
+ *            avito_id: 'int',
+ *            cian_id: 'int'
+ *          },
+ *          ...
+ *        ]
+ *      },
+ *      ...
+ *   ]
+ *} * File is in the resources folder
+ *
+ * @param fileName
+ * @param jsonArray JSONArray of cities
+ */
+fun writeCities(fileName: String, jsonArray: JSONArray) {
+    val file = getFile(fileName, true)
+    val jsonObject = JSONObject().put("cities", jsonArray)
+    file.appendText(jsonObject.toString(2))
+}
+
+/**
+ * Write cities with districts to .json file
  * Output file structure is json object with array of cities by key 'cities'
  * File is in the resources folder
  *
  * @param fileName
  * @param jsonArray JSONArray of cities
  */
-fun writeCities(fileName: String, jsonArray: JSONArray) {
-    val path = pathToResourceFolder() + "$fileName.json"
-    val jsonFile = File(path)
-
-    if (jsonFile.exists()) jsonFile.delete()
-    jsonFile.createNewFile()
-
-    val jsonObject = JSONObject()
-    jsonObject.put("cities", jsonArray)
-
-    jsonFile.appendText(jsonObject.toString(2))
-}
-
-
-fun writeCityWithDistricts(
+fun writeCitiesWithDistricts(
     fileName: String,
-    cityName: String,
-    districts: List<DistrictDto>
+    cities: List<CityDto>
 ) {
-    val listDistrictJson = districts.map { it.toJSON() }
-    val id = transliterateCyrillicToLatin(cityName)
-
-    val json = JSONObject()
-        .put("id", id)
-        .put("name", cityName)
-        .put("districts", JSONArray(listDistrictJson))
-
-    File(pathToResourceFolder() + "$fileName.json").appendText("$json \n\n")
+    val jsonArray = JSONArray(cities.map { CityDto::toJSON })
+    val json = JSONObject().put("cities", jsonArray)
+    val file = getFile(fileName, true)
+    file.appendText(json.toString(2))
 }
 
-fun pathToResourceFolder() = System.getProperty("user.dir") + "\\src\\resources\\"
+private fun pathToResourceFolder() = System.getProperty("user.dir") + "\\src\\resources\\"
+
+private fun getFile(name: String, empty: Boolean): File {
+    val path = pathToResourceFolder() + "$name.json"
+    val file = File(path)
+
+    if (file.exists() && empty) file.delete()
+    file.createNewFile()
+
+    return file
+}

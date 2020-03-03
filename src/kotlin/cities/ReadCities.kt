@@ -4,7 +4,7 @@ import Logger
 import formatExt
 import org.json.JSONArray
 import org.json.JSONObject
-import saving.readCities
+import saving.readCitiesCsv
 import saving.writeCities
 
 const val FILE_NAME = "more_cities"
@@ -30,7 +30,7 @@ enum class Cite { AVITO, CIAN }
 fun main() {
     Logger.logNewRunning()
 
-    val cities = readCities(FILE_NAME)
+    val cities = readCitiesCsv(FILE_NAME)
     val jsonArray = JSONArray()
 
     for ((i, cityName) in cities.withIndex()) {

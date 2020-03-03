@@ -15,24 +15,36 @@ import transliterateCyrillicToLatin
 
 private const val CITY_NAME_LENGTH = 30
 private const val DISTRICT_NAME_LENGTH = 30
+private const val URL_LENGTH = 50
 
 object CityTable : IdTable<String>() {
     override val id: Column<EntityID<String>>
         get() = varchar("id", CITY_NAME_LENGTH).entityId()
     val name = varchar("name", CITY_NAME_LENGTH)
+    val avitoId = DistrictTable.integer("avito_id")
+    val avitoUrl = DistrictTable.varchar("avito_url", URL_LENGTH)
+    val cianId = DistrictTable.integer("cian_id")
+    val cianUrl = DistrictTable.varchar("cian-url", URL_LENGTH)
 }
 
 class City(id: EntityID<String>) : Entity<String>(id) {
     companion object : EntityClass<String, City>(CityTable)
 
     var name by CityTable.name
+    var avitoId by DistrictTable.avitoId
+    var avitoUrl by DistrictTable.avitoUrl
+    var cianId by DistrictTable.cianId
+    var cianUrl by DistrictTable.cianUrl
 }
 
 
 object DistrictTable : IntIdTable() {
     val name = varchar("name", DISTRICT_NAME_LENGTH)
-    val idAvito = integer("id_avito")
-    val idCian = integer("id_cian")
+    // TODO add fields and change names
+    val avitoId = integer("avito_id")
+    val avitoUrl = varchar("avito_url", URL_LENGTH)
+    val cianId = integer("cian_id")
+    val cianUrl = varchar("cian-url", URL_LENGTH)
     val cityName = varchar("city_name", CITY_NAME_LENGTH)
 }
 
@@ -40,23 +52,11 @@ class District(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<District>(DistrictTable)
 
     var name by DistrictTable.name
-    var idAvito by DistrictTable.idAvito
-    var idCian by DistrictTable.idCian
+    var avitoId by DistrictTable.avitoId
+    var avitoUrl by DistrictTable.avitoUrl
+    var cianId by DistrictTable.cianId
+    var cianUrl by DistrictTable.cianUrl
     var cityName by DistrictTable.cityName
-}
-
-data class DistrictDto(
-    val name: String,
-    var idAvito: Int = 0,
-    var idCian: Int = 0,
-    val isMetro: Boolean = false
-) {
-    fun toJSON(): JSONObject? {
-        return JSONObject()
-            .put("name", name)
-            .put("avito_id", idAvito)
-            .put("cian_id", idCian)
-    }
 }
 
 fun connectDB() {
@@ -73,8 +73,8 @@ fun saveDistrict(name: String, cityId: String, avitoId: Int = 0, cianId: Int = 0
         District.new {
             this.name = name
             this.cityName = cityId
-            this.idAvito = avitoId
-            this.idCian = cianId
+            this.avitoId = avitoId
+            this.cianId = cianId
         }
     }
 }

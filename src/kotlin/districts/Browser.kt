@@ -11,7 +11,7 @@ import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.RemoteWebElement
 import saving.DistrictDto
-import saving.writeCityWithDistricts
+import saving.writeCitiesWithDistricts
 import java.io.Closeable
 
 
@@ -118,7 +118,7 @@ class Browser : Closeable {
         }
 
         // TODO: set fileName
-        writeCityWithDistricts("", "Казань", metroList)
+        writeCitiesWithDistricts("", "Казань", metroList)
 
         return metroList
     }
