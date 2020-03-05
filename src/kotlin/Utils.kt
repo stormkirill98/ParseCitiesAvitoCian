@@ -2,6 +2,7 @@ import com.ibm.icu.text.Transliterator
 import java.net.HttpURLConnection
 import java.net.URL
 
+enum class Site { AVITO, CIAN }
 
 fun checkUrl(url: String) =
     try {

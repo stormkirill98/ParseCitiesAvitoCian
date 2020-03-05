@@ -54,6 +54,7 @@ class Browser : Closeable {
             driver.currentUrl to id
         } catch (e: NoSuchElementException) {
             try {
+
                 val closeButton = driver.findElement(By.cssSelector("svg[class='$CIAN_CLOSE_SEARCH_CLASS']"))
                 click(closeButton, 0)
             } catch (e: Exception) {

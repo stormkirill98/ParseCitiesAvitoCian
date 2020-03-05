@@ -1,57 +1,77 @@
 package districts
 
+import Site
 import Logger
 import fetchData
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import saving.CityDto
 import saving.DistrictDto
 import saving.readCitiesJson
 import saving.writeCitiesWithDistricts
 import java.io.FileNotFoundException
 
-const val FILE_NAME = "cities"
+const val FILE_NAME = "test"
 
 fun main() {
     Logger.logNewRunning()
     val cities = readCitiesJson(FILE_NAME)
 
-    for (city in cities) {
-        println("Get districts for ${city.name}")
-        Logger.currentCity = city.name
-        try {
-            val districts = getDistricts(city.avitoId, city.cianId)
-            city.addDistricts(districts)
-        } catch (e: JSONException) { Logger.logException(e) }
+    Browser().use {
+        for (city in cities) {
+            println("Get districts for ${city.name}")
+            Logger.currentCity = city.name
+            try {
+                val districts = getDistricts(city, browser = it)
+                city.addDistricts(districts)
+            } catch (e: JSONException) {
+                Logger.logException(e)
+            }
 
-        Thread.sleep(1000)
+            Thread.sleep(1000)
+        }
     }
 
     writeCitiesWithDistricts(FILE_NAME, cities)
 }
 
-fun getDistricts(avitoCityId: Int, cianCityId: Int): List<DistrictDto> {
+fun getDistricts(city: CityDto, browser: Browser): List<DistrictDto> {
     var isMetro = false
 
     Thread.sleep(500)
-    val resAvito = try {
-        fetchData("https://www.avito.ru/web/1/locations/districts?locationId=$avitoCityId")
-    } catch (e: FileNotFoundException) {
-        isMetro = true
-        fetchData("https://www.avito.ru/web/1/locations/metro?locationId=$avitoCityId")
-    }
-    val avitoDistricts = parseDistrictsJson(JSONArray(resAvito), "avito", isMetro)
+    val avitoDistricts = try {
+        val resAvito = try {
+            fetchData("https://www.avito.ru/web/1/locations/districts?locationId=${city.avitoId}")
+        } catch (e: FileNotFoundException) {
+            isMetro = true
+            fetchData("https://www.avito.ru/web/1/locations/metro?locationId=${city.avitoId}")
+        }
 
-    /*if (isMetro) {
-       districts.HeadlessBrowser.getMetroCian("asd")
-   } else {*/
-    val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=$cianCityId")
-    val cianDistricts = parseDistrictsJson(JSONArray(resCian), "cian", isMetro)
+        parseDistrictsJson(JSONArray(resAvito), Site.AVITO, isMetro)
+    } catch (e: Exception) {
+        e.printStackTrace();
+        emptyList<DistrictDto>()
+    }
+
+    // TODO govno code
+    val cianDistricts = try {
+        if (isMetro) {
+            browser.getMetroCian(city)
+        } else {
+            // TODO достаточно ли id
+            val resCian = fetchData("https://yaroslavl.cian.ru/api/geo/get-districts-tree/?locationId=${city.cianId}")
+            parseDistrictsJson(JSONArray(resCian), Site.CIAN, false)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        emptyList<DistrictDto>()
+    }
 
     return combineDistricts(avitoDistricts, cianDistricts)
 }
 
-fun parseDistrictsJson(array: JSONArray, cite: String, isMetro: Boolean): ArrayList<DistrictDto> {
+fun parseDistrictsJson(array: JSONArray, site: Site, isMetro: Boolean): ArrayList<DistrictDto> {
     val districts = arrayListOf<DistrictDto>()
 
     for (obj in array) {
@@ -60,7 +80,7 @@ fun parseDistrictsJson(array: JSONArray, cite: String, isMetro: Boolean): ArrayL
         val id = obj.getInt("id")
         val name = obj.getString("name")
 
-        val district = if (cite == "cian")
+        val district = if (site == Site.CIAN)
             DistrictDto(name, idCian = id, isMetro = isMetro)
         else DistrictDto(name, idAvito = id, isMetro = isMetro)
 
@@ -70,6 +90,7 @@ fun parseDistrictsJson(array: JSONArray, cite: String, isMetro: Boolean): ArrayL
     return districts
 }
 
+// TODO test empty list and not empty
 fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<DistrictDto>): List<DistrictDto> {
     if (avitoDistricts.size != cianDistricts.size) {
         Logger.logNotEqualsDistrictsSize(avitoDistricts.size, cianDistricts.size)

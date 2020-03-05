@@ -10,14 +10,10 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.RemoteWebElement
+import saving.CityDto
 import saving.DistrictDto
-import saving.writeCitiesWithDistricts
 import java.io.Closeable
-
-
-fun main() {
-    Browser().use { it.getMetroCian("Казань") }
-}
+import java.util.concurrent.TimeUnit
 
 const val PROXY_PORT = 8089
 
@@ -49,15 +45,15 @@ class Browser : Closeable {
         }
 
         driver = ChromeDriver(options)
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS)
     }
 
-    fun getMetroCian(city: String): ArrayList<DistrictDto> {
+    fun getMetroCian(city: CityDto): ArrayList<DistrictDto> {
         val metroList = ArrayList<DistrictDto>()
-        Logger.currentCity = city // TODO delete
         val metroButtonCssClasses =
             "_2_I0uxAX1QTt_l4n _35LKst7i1uZi74JV _2yfeFLx02AjM6sHY _93444fe79c--button--T1QJW _93444fe79c--button--1-EOD _93444fe79c--button--first--uMIyU"
 
-        if (!loadPage("https://kazan.cian.ru/snyat-kvartiru/")) {
+        if (!loadPage(city.cianUrl)) {
             Logger.logNotLoadPage()
             return metroList
         }
@@ -66,7 +62,7 @@ class Browser : Closeable {
         while (index < 20) {
             try {
                 val metroBtn = driver.findElement(By.cssSelector("button[class='$metroButtonCssClasses']"))
-                click(metroBtn, 200)
+                click(metroBtn, 0)
 
                 val allMetroContainer = driver
                     .findElement(By.cssSelector("div[class='underground_map_widget-metro-EWxE5zul']"))
@@ -110,15 +106,12 @@ class Browser : Closeable {
                 }
             } catch (e: ElementClickInterceptedException) {
                 val closeBtn = driver.findElement(By.cssSelector("div[class='_93444fe79c--button--3lsO-']"))
-                click(closeBtn, 200)
+                click(closeBtn, 0)
             } catch (e: Exception) {
                 println(e.message)
                 println()
             }
         }
-
-        // TODO: set fileName
-        writeCitiesWithDistricts("", "Казань", metroList)
 
         return metroList
     }

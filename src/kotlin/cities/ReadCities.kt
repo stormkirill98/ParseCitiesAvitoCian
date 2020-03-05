@@ -1,13 +1,15 @@
 package cities
 
 import Logger
+import Site
 import formatExt
 import org.json.JSONArray
 import org.json.JSONObject
 import saving.readCitiesCsv
 import saving.writeCities
 
-const val FILE_NAME = "more_cities"
+const val FILE_NAME = "test"
+
 const val CIAN_URL = "https://yaroslavl.cian.ru/"
 const val AVITO_URL = "https://www.avito.ru/yaroslavl"
 
@@ -24,8 +26,6 @@ const val AVITO_SEARCH_INPUT_CLASS = "suggest-input-3p8yi"
 const val AVITO_SUGGESTIONS_LIST_CLASS = "suggest-suggests-bMAdj"
 const val AVITO_ENTER_BUTTON = "button-button-2Fo5k button-size-m-7jtw4 button-primary-1RhOG"
 const val AVITO_CLOSE_SEARCH_CLASS = "popup-close-2W0cr"
-
-enum class Cite { AVITO, CIAN }
 
 fun main() {
     Logger.logNewRunning()
@@ -46,10 +46,10 @@ fun main() {
 
     Browser().use {
         it.openCianPage()
-        fillCities(Cite.CIAN, jsonArray, it)
+        fillCities(Site.CIAN, jsonArray, it)
 
         it.openAvitoPage()
-        fillCities(Cite.AVITO, jsonArray, it)
+        fillCities(Site.AVITO, jsonArray, it)
     }
 
 
@@ -64,24 +64,24 @@ fun main() {
     writeCities(FILE_NAME, JSONArray(filteredArray))
 }
 
-fun fillCities(cite: Cite, jsonArray: JSONArray, browser: Browser) {
+fun fillCities(site: Site, jsonArray: JSONArray, browser: Browser) {
     for ((i, jsonObj) in jsonArray.withIndex()) {
         if (jsonObj !is JSONObject) continue
 
         val name = jsonObj.getString("name")
         val percent = (i + 1) / jsonArray.length().toDouble()
-        println("$i Fill $cite. $name       ${percent.formatExt(2)}")
+        println("$i Fill $site. $name       ${percent.formatExt(2)}")
 
-        val (url, id) = if (cite == Cite.AVITO)
+        val (url, id) = if (site == Site.AVITO)
             browser.getAvitoInfo(name)
         else browser.getCianInfo(name)
 
         if (url.isEmpty() || id == null) {
-            Logger.logNotDefineUrlOrId(name, cite.name)
+            Logger.logNotDefineUrlOrId(name, site.name)
         }
 
-        jsonObj.put(cite.name.toLowerCase() + "_url", url)
-        jsonObj.put(cite.name.toLowerCase() + "_id", id)
+        jsonObj.put(site.name.toLowerCase() + "_url", url)
+        jsonObj.put(site.name.toLowerCase() + "_id", id)
         Thread.sleep(500)
     }
 }
