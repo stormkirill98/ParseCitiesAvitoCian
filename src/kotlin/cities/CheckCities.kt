@@ -1,13 +1,17 @@
+package cities
+
 import org.json.JSONObject
 
 fun main() {
-    val file = {}.javaClass.getResource("more_cities.json")
+    val file = {}.javaClass.getResource("parse_cities.json")
     val fileText = file.readText()
 
     val jsonArray = JSONObject(fileText).getJSONArray("cities")
 
-    val filteredArray = jsonArray.filter { (it as JSONObject).getString("cian_url").isEmpty()
-            || it.getString("avito_url").isEmpty() }
+    val filteredArray = jsonArray.filter {
+        (it as JSONObject).getString("cian_url").isEmpty()
+                || it.getString("avito_url").isEmpty()
+    }
 
     val countCianEmpty = filteredArray.count { (it as JSONObject).getString("cian_url").isEmpty() }
     val countAvitoEmpty = filteredArray.count { (it as JSONObject).getString("avito_url").isEmpty() }
