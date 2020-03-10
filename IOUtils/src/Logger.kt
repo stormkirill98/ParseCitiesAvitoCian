@@ -1,10 +1,9 @@
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 object Logger {
     lateinit var currentCity: String
-    val file = File("C:\\Users\\odmen\\Desktop\\AvitoCianParser\\src\\logs")
+    private val file = getFile("logs")
 
     fun logWrongCityId(errorId: Int, site: String) {
         when (errorId) {
@@ -60,6 +59,5 @@ object Logger {
 
     fun logWrongNameOnPage(cityName: String, cityNameOnPage: String, currentUrl: String) {
         file.appendText("$cityName: on page $currentUrl name is $cityNameOnPage\n")
-
     }
 }

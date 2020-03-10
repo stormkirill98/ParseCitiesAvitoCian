@@ -1,9 +1,10 @@
 package cities
 
+import getFile
 import org.json.JSONObject
 
 internal fun main() {
-    val file = {}.javaClass.getResource("parse_cities.json")
+    val file = getFile("parsed_cities.json")
     val fileText = file.readText()
 
     val jsonArray = JSONObject(fileText).getJSONArray("cities")

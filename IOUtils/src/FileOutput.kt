@@ -107,9 +107,16 @@ fun writeCitiesWithDistricts(
     file.appendText(json.toString(2))
 }
 
-private fun pathToResourceFolder() = System.getProperty("user.dir") + "\\src\\resources\\"
-
-private fun getFile(name: String, empty: Boolean = false): File {
+/**
+ * Get file from resources folder in root folder of project
+ * If file with name not exists then create this
+ *
+ * @param name
+ * @param empty - clear file or not
+ *
+ * @return {File}
+ */
+fun getFile(name: String, empty: Boolean = false): File {
     val path = pathToResourceFolder() + name
     val file = File(path)
 
@@ -118,3 +125,5 @@ private fun getFile(name: String, empty: Boolean = false): File {
 
     return file
 }
+
+private fun pathToResourceFolder() = System.getProperty("user.dir") + "\\resources\\"
