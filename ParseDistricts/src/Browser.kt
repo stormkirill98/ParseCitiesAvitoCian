@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 const val PROXY_PORT = 8089
 
-class Browser : Closeable {
+internal class Browser : Closeable {
     private val driver: WebDriver
     private val proxy: MoxProxy = LocalMoxProxy.builder()
         .withPort(PROXY_PORT)

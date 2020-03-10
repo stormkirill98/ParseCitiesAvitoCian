@@ -76,9 +76,8 @@ fun saveDistrict(name: String, cityId: String, avitoId: Int = 0, cianId: Int = 0
 }
 
 fun saveCity(name: String): City {
-    val id = transliterateCyrillicToLatin(name)
     return transaction {
-        City.new(id) {
+        City.new(name) {
             this.name = name
         }
     }

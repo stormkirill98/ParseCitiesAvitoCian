@@ -7,7 +7,7 @@ import org.openqa.selenium.interactions.Actions
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
-class Browser : Closeable {
+internal class Browser : Closeable {
     private val driver: WebDriver
 
     init {

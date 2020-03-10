@@ -13,7 +13,7 @@ import java.io.FileNotFoundException
 
 const val FILE_NAME = "test"
 
-fun main() {
+internal fun main() {
     Logger.logNewRunning()
     val cities = readCitiesJson(FILE_NAME)
 
@@ -35,7 +35,7 @@ fun main() {
     writeCitiesWithDistricts(FILE_NAME, cities)
 }
 
-fun getDistricts(city: CityDto, browser: Browser): List<DistrictDto> {
+internal fun getDistricts(city: CityDto, browser: Browser): List<DistrictDto> {
     var isMetro = false
 
     Thread.sleep(500)
@@ -70,7 +70,7 @@ fun getDistricts(city: CityDto, browser: Browser): List<DistrictDto> {
     return combineDistricts(avitoDistricts, cianDistricts)
 }
 
-fun parseDistrictsJson(array: JSONArray, site: Site, isMetro: Boolean): ArrayList<DistrictDto> {
+internal fun parseDistrictsJson(array: JSONArray, site: Site, isMetro: Boolean): ArrayList<DistrictDto> {
     val districts = arrayListOf<DistrictDto>()
 
     for (obj in array) {
@@ -90,7 +90,7 @@ fun parseDistrictsJson(array: JSONArray, site: Site, isMetro: Boolean): ArrayLis
 }
 
 // TODO test empty list and not empty
-fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<DistrictDto>): List<DistrictDto> {
+internal fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<DistrictDto>): List<DistrictDto> {
     if (avitoDistricts.size != cianDistricts.size) {
         Logger.logNotEqualsDistrictsSize(avitoDistricts.size, cianDistricts.size)
     }
@@ -129,7 +129,7 @@ fun combineDistricts(avitoDistricts: List<DistrictDto>, cianDistricts: List<Dist
     return newList
 }
 
-fun getDistrictByName(list: List<DistrictDto>, name: String): DistrictDto? {
+internal fun getDistrictByName(list: List<DistrictDto>, name: String): DistrictDto? {
     for (district in list) {
         if (district.name == name) return district
     }

@@ -2,7 +2,7 @@ package cities
 
 import org.json.JSONObject
 
-fun main() {
+internal fun main() {
     val file = {}.javaClass.getResource("parse_cities.json")
     val fileText = file.readText()
 

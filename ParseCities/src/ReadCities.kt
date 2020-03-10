@@ -26,7 +26,7 @@ const val AVITO_SUGGESTIONS_LIST_CLASS = "suggest-suggests-bMAdj"
 const val AVITO_ENTER_BUTTON = "button-button-2Fo5k button-size-m-7jtw4 button-primary-1RhOG"
 const val AVITO_CLOSE_SEARCH_CLASS = "popup-close-2W0cr"
 
-fun main() {
+internal fun main() {
     Logger.logNewRunning()
 
     val cities = readCitiesCsv(FILE_NAME)
@@ -63,7 +63,7 @@ fun main() {
     writeCities(FILE_NAME, JSONArray(filteredArray))
 }
 
-fun fillCities(site: Site, jsonArray: JSONArray, browser: Browser) {
+internal fun fillCities(site: Site, jsonArray: JSONArray, browser: Browser) {
     for ((i, jsonObj) in jsonArray.withIndex()) {
         if (jsonObj !is JSONObject) continue
 
