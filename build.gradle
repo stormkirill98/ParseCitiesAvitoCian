@@ -8,32 +8,32 @@ buildscript {
     }
 }
 
-apply plugin: 'kotlin'
-
-group 'com.group'
-version '0.0.1'
-
-sourceSets {
-    main.kotlin.srcDirs = [ 'src' ]
+allprojects {
+    group 'com.group'
+    version '0.0.1'
 }
 
-repositories {
-    jcenter()
-}
+subprojects {
+    apply plugin: 'kotlin'
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    repositories {
+        jcenter()
+    }
 
-    compile "org.jetbrains.exposed:exposed-core:$exposed_version"
-    compile "org.jetbrains.exposed:exposed-dao:$exposed_version"
-    compile "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
-    compile "org.postgresql:postgresql:$postgresql_version"
-    compile "com.google.cloud.sql:postgres-socket-factory:$postgres_socket_version"
+    dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    compile "org.jsoup:jsoup:$jsoup_version"
-    compile "com.ibm.icu:icu4j:$icu4j_version"
-    compile "org.json:json:$json_version"
-    compile "org.seleniumhq.selenium:selenium-java:$selenium_version"
-    compile "com.google.guava:guava:$guava_version"
-    compile "com.moxproxy:moxproxy.core:$moxproxy_version"
+        compile "org.jetbrains.exposed:exposed-core:$exposed_version"
+        compile "org.jetbrains.exposed:exposed-dao:$exposed_version"
+        compile "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
+        compile "org.postgresql:postgresql:$postgresql_version"
+        compile "com.google.cloud.sql:postgres-socket-factory:$postgres_socket_version"
+
+        compile "org.jsoup:jsoup:$jsoup_version"
+        compile "com.ibm.icu:icu4j:$icu4j_version"
+        compile "org.json:json:$json_version"
+        compile "org.seleniumhq.selenium:selenium-java:$selenium_version"
+        compile "com.google.guava:guava:$guava_version"
+        compile "com.moxproxy:moxproxy.core:$moxproxy_version"
+    }
 }

@@ -1,0 +1,5 @@
+apply plugin: 'kotlin'
+
+sourceSets {
+    main.kotlin.srcDirs = [ 'src' ]
+}

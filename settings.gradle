@@ -1,0 +1,5 @@
+rootProject.name = "ParseCitiesAvitoCian"
+
+include "ParseCities"
+include "ParseDistricts"
+include "IOUtils"
