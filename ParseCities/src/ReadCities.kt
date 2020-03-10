@@ -1,12 +1,11 @@
 package cities
 
-import Logger
 import Site
 import formatExt
 import org.json.JSONArray
 import org.json.JSONObject
-import saving.readCitiesCsv
-import saving.writeCities
+import readCitiesCsv
+import writeCities
 
 const val FILE_NAME = "test"
 

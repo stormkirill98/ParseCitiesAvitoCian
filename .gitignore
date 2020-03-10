@@ -9,3 +9,6 @@
 /classes/
 gradlew
 gradlew.bat
+/IOUtils/build/
+/ParseCities/build/
+/build/

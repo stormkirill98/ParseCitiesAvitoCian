@@ -1,5 +1,3 @@
-package saving
-
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.IntEntity
@@ -10,8 +8,6 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.json.JSONObject
-import transliterateCyrillicToLatin
 
 private const val CITY_NAME_LENGTH = 30
 private const val DISTRICT_NAME_LENGTH = 30

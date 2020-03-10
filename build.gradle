@@ -11,9 +11,7 @@ buildscript {
 allprojects {
     group 'com.group'
     version '0.0.1'
-}
 
-subprojects {
     apply plugin: 'kotlin'
 
     repositories {

@@ -1,6 +1,7 @@
 package districts
 
-import Logger
+import CityDto
+import DistrictDto
 import moxproxy.builders.LocalMoxProxy
 import moxproxy.interfaces.MoxProxy
 import org.json.JSONException
@@ -10,8 +11,6 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.RemoteWebElement
-import saving.CityDto
-import saving.DistrictDto
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 

@@ -1,15 +1,14 @@
 package districts
 
+import CityDto
+import DistrictDto
 import Site
-import Logger
 import fetchData
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import saving.CityDto
-import saving.DistrictDto
-import saving.readCitiesJson
-import saving.writeCitiesWithDistricts
+import readCitiesJson
+import writeCitiesWithDistricts
 import java.io.FileNotFoundException
 
 const val FILE_NAME = "test"

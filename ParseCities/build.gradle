@@ -3,3 +3,7 @@ apply plugin: 'kotlin'
 sourceSets {
     main.kotlin.srcDirs = [ 'src' ]
 }
+
+dependencies {
+    compile project(':IOUtils')
+}
