@@ -28,7 +28,6 @@ allprojects {
         compile "com.google.cloud.sql:postgres-socket-factory:$postgres_socket_version"
 
         compile "org.jsoup:jsoup:$jsoup_version"
-        compile "com.ibm.icu:icu4j:$icu4j_version"
         compile "org.json:json:$json_version"
         compile "org.seleniumhq.selenium:selenium-java:$selenium_version"
         compile "com.google.guava:guava:$guava_version"

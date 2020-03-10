@@ -1,4 +1,3 @@
-import com.ibm.icu.text.Transliterator
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -33,11 +32,6 @@ fun fetchData(url: String): String {
     connection.addRequestProperty("accept-language", "en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7")
 
     return connection.getInputStream().readBytes().toString(Charsets.UTF_8)
-}
-
-fun transliterateCyrillicToLatin(str: String): String {
-    val toLatinTrans = Transliterator.getInstance("Russian-Latin/BGN")
-    return toLatinTrans.transliterate(str).replace("ʹ", "").replace(" ", "_").toLowerCase()
 }
 
 fun Double.formatExt(digits: Int) = "%.${digits}f".format(this)
